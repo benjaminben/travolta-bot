@@ -7,10 +7,10 @@ import json
 ap = argparse.ArgumentParser()
 ap.add_argument("-data", default="./data/test.txt")
 ap.add_argument("-baseUrl", default="http://localhost:3000")
-ap.add_argument("-handle", default=None)
+ap.add_argument("-boykey", default="pt0")
 args = vars(ap.parse_args())
 data = args["data"]
-botkey = args["botkey", default="pt0"]
+botkey = args["botkey"]
 baseUrl = args["baseUrl"]
 
 textgen = None
