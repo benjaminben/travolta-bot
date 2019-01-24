@@ -1,17 +1,21 @@
 from textgenrnn import textgenrnn
 import argparse
+import schedule
 import requests
 import os.path
 import json
+import time
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-data", default="./data/test.txt")
 ap.add_argument("-baseUrl", default="http://localhost:3000")
 ap.add_argument("-botkey", default="pt0")
+ap.add_argument("-loop", default=False)
 args = vars(ap.parse_args())
 data = args["data"]
 botkey = args["botkey"]
 baseUrl = args["baseUrl"]
+loop = args["loop"]
 
 textgen = None
 
@@ -58,4 +62,32 @@ def makeBot(botkey, file):
     textgen = None
     return
 
-makeBot(botkey, data)
+def loopBots():
+    idx = 0
+    botkeys = ["pt1", "pt2", "pt3", "pt4", "pt5"]
+    files = [
+        "plastic-bubble.txt",
+        "pulp-ezekiel.txt",
+        "battlefield-cat.txt",
+        "Ultra__Travolta.txt",
+        "hairspray-sutta.txt"
+    ]
+    while idx < len(botkeys):
+        key = botkeys[idx]
+        file = "./data/{}".format(files[idx])
+        status = generateText(key, file)
+        submitStatus(key, status)
+        textgen = None
+        idx += 1
+
+def boop():
+    print("boop")
+
+if loop:
+    loopBots()
+    schedule.every(10).seconds.do(loopBots)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+else:
+    makeBot(botkey, data)
