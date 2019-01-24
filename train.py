@@ -7,7 +7,7 @@ import json
 ap = argparse.ArgumentParser()
 ap.add_argument("-data", default="./data/test.txt")
 ap.add_argument("-baseUrl", default="http://localhost:3000")
-ap.add_argument("-boykey", default="pt0")
+ap.add_argument("-botkey", default="pt0")
 args = vars(ap.parse_args())
 data = args["data"]
 botkey = args["botkey"]
