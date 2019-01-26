@@ -94,9 +94,9 @@ def boop():
 
 if loop:
     loopBots()
-    schedule.every(4).hours.do(loopBots)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # schedule.every(4).hours.do(loopBots)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
 else:
     makeBot(botkey, data)
