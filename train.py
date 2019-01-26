@@ -1,10 +1,12 @@
 from textgenrnn import textgenrnn
+from os import path
 import argparse
 import schedule
 import requests
-import os.path
+import random
 import json
 import time
+import glob
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-data", default="./data/test.txt")
@@ -21,7 +23,7 @@ textgen = None
 
 def generateText(botkey, file):
     weights = "{}_weights.hdf5".format(botkey)
-    weights_file = weights if os.path.isfile(weights) else None
+    weights_file = weights if path.isfile(weights) else None
     vocab_file = None
     config_file = None
     new = False
@@ -31,7 +33,7 @@ def generateText(botkey, file):
     # vocab_file = None
     # config_file = None
     # new = True
-    # if os.path.isfile(weights):
+    # if path.isfile(weights):
     #     weights_file = weights
     #     vocab_file = "{}_vocab.json".format(botkey)
     #     config_file = "{}_config.json".format(botkey)
@@ -54,7 +56,14 @@ def submitStatus(botkey, body):
     if (not body):
         print("No body provided")
         return
-    return requests.post(baseUrl + "/status/" + botkey, json={"status": body})
+
+    file = random.choice(glob.glob("./media/{}/*.jpg".format(botkey)))
+    files = {"file": ("media", open(file, "rb"), "image/jpeg")}
+    return requests.post(
+        "{}/status/{}".format(baseUrl, botkey),
+        files = files,
+        data = {"status": body}
+    )
 
 def makeBot(botkey, file):
     status = generateText(botkey, file)
