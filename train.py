@@ -94,7 +94,7 @@ def boop():
 
 if loop:
     loopBots()
-    schedule.every(10).seconds.do(loopBots)
+    schedule.every(4).hours.do(loopBots)
     while True:
         schedule.run_pending()
         time.sleep(1)
