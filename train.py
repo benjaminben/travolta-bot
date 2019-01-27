@@ -1,20 +1,24 @@
 from textgenrnn import textgenrnn
 from os import path
 import argparse
-import schedule
 import requests
 import random
+import sched
 import json
 import time
 import glob
 
+s = sched.scheduler(time.time, time.sleep)
+
 ap = argparse.ArgumentParser()
 ap.add_argument("-data", default="./data/test.txt")
+ap.add_argument("-temperature", default=0.5)
 ap.add_argument("-baseUrl", default="http://localhost:3000")
 ap.add_argument("-botkey", default="pt0")
 ap.add_argument("-loop", default=False)
 args = vars(ap.parse_args())
 data = args["data"]
+temperature = args["temperature"]
 botkey = args["botkey"]
 baseUrl = args["baseUrl"]
 loop = args["loop"]
@@ -46,7 +50,7 @@ def generateText(botkey, file):
         config_path=config_file,
     )
     textgen.train_from_file(file, num_epochs=1, new_model=new)
-    list = textgen.generate(1, temperature=1.0, max_gen_length=280, return_as_list=True)
+    list = textgen.generate(1, temperature=temperature, max_gen_length=280, return_as_list=True)
     return list[0]
 
 def submitStatus(botkey, body):
@@ -88,15 +92,10 @@ def loopBots():
         submitStatus(key, status)
         textgen = None
         idx += 1
-
-def boop():
-    print("boop")
+    s.enter(7200, 1, loopBots)
 
 if loop:
-    loopBots()
-    # schedule.every(4).hours.do(loopBots)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
+    s.enter(0, 1, loopBots)
+    s.run()
 else:
     makeBot(botkey, data)
