@@ -1,7 +1,7 @@
 const fs = require("fs")
-const f1 = "data/hairspray.txt"
-const f2 = "data/canki-sutta.txt"
-const of = "data/hairspray-sutta.txt"
+const f1 = "data/pulp_fiction.txt"
+const f2 = "data/ezekiel.txt"
+const of = "data/pulp-ezekiel.txt"
 
 let f1a = []
 let f2a = []

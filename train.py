@@ -10,27 +10,41 @@ import glob
 
 s = sched.scheduler(time.time, time.sleep)
 
+fileDict = {
+    "pt0" : "./data/Ultra__Travolta.txt",
+    "pt1" : "./data/plastic-bubble.txt",
+    "pt2" : "./data/pulp-ezekiel.txt",
+    "pt3" : "./data/battlefield-cat.txt",
+    "pt4" : "./data/Ultra__Travolta.txt",
+    "pt5" : "./data/hairspray-sutta.txt"
+}
+
 ap = argparse.ArgumentParser()
-ap.add_argument("-data", default="./data/test.txt")
+ap.add_argument("-data")
+ap.add_argument("-botkey")
 ap.add_argument("-temperature", default=0.5)
 ap.add_argument("-baseUrl", default="http://localhost:3000")
-ap.add_argument("-botkey", default="pt0")
 ap.add_argument("-loop", default=False)
-args = vars(ap.parse_args())
-data = args["data"]
+ap.add_argument("-picOdds", default=0.75)
+args        = vars(ap.parse_args())
+data        = args["data"] if args["data"] else fileDict[args["botkey"]] if args["botkey"] else "./data/test.txt"
+botkey      = args["botkey"] if args["botkey"] else "pt0"
 temperature = args["temperature"]
-botkey = args["botkey"]
-baseUrl = args["baseUrl"]
-loop = args["loop"]
+baseUrl     = args["baseUrl"]
+loop        = args["loop"]
+picOdds     = float(args["picOdds"])
 
 textgen = None
 
+def coinFlip(bias=0.5):
+    return random.random() < bias
+
 def generateText(botkey, file):
-    weights = "{}_weights.hdf5".format(botkey)
+    weights      = "{}_weights.hdf5".format(botkey)
     weights_file = weights if path.isfile(weights) else None
-    vocab_file = None
-    config_file = None
-    new = False
+    vocab_file   = None
+    config_file  = None
+    new          = False
 
     # # OPTION OF TRAINING FROM ENTIRELY NEW MODEL
     # weights_file = None
@@ -44,10 +58,10 @@ def generateText(botkey, file):
     #     new = False
 
     textgen = textgenrnn(
-        name=botkey,
-        weights_path=weights_file,
-        vocab_path=vocab_file,
-        config_path=config_file,
+        name         = botkey,
+        weights_path = weights_file,
+        vocab_path   = vocab_file,
+        config_path  = config_file,
     )
     textgen.train_from_file(file, num_epochs=1, new_model=new)
     list = textgen.generate(1, temperature=temperature, max_gen_length=280, return_as_list=True)
@@ -60,14 +74,13 @@ def submitStatus(botkey, body):
     if (not body):
         print("No body provided")
         return
-
-    file = random.choice(glob.glob("./media/{}/*.jpg".format(botkey)))
-    files = {"file": ("media", open(file, "rb"), "image/jpeg")}
-    return requests.post(
-        "{}/status/{}".format(baseUrl, botkey),
-        files = files,
-        data = {"status": body}
-    )
+    data     = {"status": body}
+    endpoint = "{}/status/{}".format(baseUrl, botkey)
+    if (coinFlip(picOdds)):
+        file  = random.choice(glob.glob("./media/{}/*.jpg".format(botkey)))
+        files = {"file": ("media", open(file, "rb"), "image/jpeg")}
+        return requests.post(endpoint, files=files, data=data)
+    return requests.post(endpoint, json=data)
 
 def makeBot(botkey, file):
     status = generateText(botkey, file)
@@ -77,18 +90,10 @@ def makeBot(botkey, file):
 
 def loopBots():
     idx = 0
-    botkeys = ["pt1", "pt2", "pt3", "pt4", "pt5"]
-    files = [
-        "plastic-bubble.txt",
-        "pulp-ezekiel.txt",
-        "battlefield-cat.txt",
-        "Ultra__Travolta.txt",
-        "hairspray-sutta.txt"
-    ]
     while idx < len(botkeys):
-        key = botkeys[idx]
-        file = "./data/{}".format(files[idx])
-        status = generateText(key, file)
+        key     = "pt" + str(idx)
+        file    = fileDict[key]
+        status  = generateText(key, file)
         submitStatus(key, status)
         textgen = None
         idx += 1
