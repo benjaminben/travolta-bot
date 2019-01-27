@@ -89,8 +89,8 @@ def makeBot(botkey, file):
     return
 
 def loopBots():
-    idx = 0
-    while idx < len(botkeys):
+    idx = 1
+    while idx < 5:
         key     = "pt" + str(idx)
         file    = fileDict[key]
         status  = generateText(key, file)
