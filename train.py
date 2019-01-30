@@ -29,10 +29,10 @@ ap.add_argument("-picOdds", default=0.75)
 args        = vars(ap.parse_args())
 data        = args["data"] if args["data"] else fileDict[args["botkey"]] if args["botkey"] else "./data/test.txt"
 botkey      = args["botkey"] if args["botkey"] else "pt0"
-temperature = args["temperature"]
 baseUrl     = args["baseUrl"]
 loop        = args["loop"]
 picOdds     = float(args["picOdds"])
+temperature = float(args["temperature"])
 
 textgen = None
 
