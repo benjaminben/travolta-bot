@@ -15,7 +15,7 @@ fileDict = {
     "pt1" : "./data/plastic-bubble.txt",
     "pt2" : "./data/pulp-ezekiel.txt",
     "pt3" : "./data/battlefield-cat.txt",
-    "pt4" : "./data/Ultra__Travolta.txt",
+    "pt4" : "./data/ultra-fever.txt",
     "pt5" : "./data/hairspray-sutta.txt"
 }
 
