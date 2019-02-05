@@ -3,20 +3,19 @@ from os import path
 import argparse
 import requests
 import random
-import sched
 import json
 import time
 import glob
 
-s = sched.scheduler(time.time, time.sleep)
+rt = path.dirname(path.abspath(__file__))
 
 fileDict = {
-    "pt0" : "./data/Ultra__Travolta.txt",
-    "pt1" : "./data/plastic-bubble.txt",
-    "pt2" : "./data/pulp-ezekiel.txt",
-    "pt3" : "./data/battlefield-cat.txt",
-    "pt4" : "./data/ultra-fever.txt",
-    "pt5" : "./data/hairspray-sutta.txt"
+    "pt0" : "{}/data/Ultra__Travolta.txt".format(rt),
+    "pt1" : "{}/data/plastic-bubble.txt".format(rt),
+    "pt2" : "{}/data/pulp-ezekiel.txt".format(rt),
+    "pt3" : "{}/data/battlefield-cat.txt".format(rt),
+    "pt4" : "{}/data/ultra-fever.txt".format(rt),
+    "pt5" : "{}/data/hairspray-sutta.txt".format(rt)
 }
 
 ap = argparse.ArgumentParser()
@@ -40,7 +39,7 @@ def coinFlip(bias=0.5):
     return random.random() < bias
 
 def generateText(botkey, file):
-    weights      = "{}_weights.hdf5".format(botkey)
+    weights      = "{}/{}_weights.hdf5".format(rt, botkey)
     weights_file = weights if path.isfile(weights) else None
     vocab_file   = None
     config_file  = None
@@ -77,7 +76,7 @@ def submitStatus(botkey, body):
     data     = {"status": body}
     endpoint = "{}/status/{}".format(baseUrl, botkey)
     if (coinFlip(picOdds)):
-        file  = random.choice(glob.glob("./media/{}/*.jpg".format(botkey)))
+        file  = random.choice(glob.glob("{}/media/{}/*.jpg".format(rt, botkey)))
         files = {"file": ("media", open(file, "rb"), "image/jpeg")}
         return requests.post(endpoint, files=files, data=data)
     return requests.post(endpoint, json=data)
@@ -97,10 +96,8 @@ def loopBots():
         submitStatus(key, status)
         textgen = None
         idx += 1
-    s.enter(7200, 1, loopBots)
 
 if loop:
-    s.enter(0, 1, loopBots)
-    s.run()
+    loopBots()
 else:
     makeBot(botkey, data)
