@@ -1,2 +1,4 @@
 *_weights.hdf5
 boop.py
+cron.lock
+nohup.out
